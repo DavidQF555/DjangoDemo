@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 class Course(models.Model):
     name = models.CharField(max_length=100)
+    description = models.CharField(max_length=1000)
     date_added = models.DateTimeField()
     capacity = models.IntegerField()
 

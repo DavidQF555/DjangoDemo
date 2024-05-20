@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{{ course.name }}</title>
+    </head>
+    <body>
+        <a href="{% url 'course_enroll:enroll' %}">Back</a>
+        <br />
+        <h1>{{ course.name }}</h1>
+        <br />
+        <p>{{ course.description }}</p>
+    </body>
+</html>

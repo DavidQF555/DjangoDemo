@@ -18,6 +18,6 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('course_enroll/', include("course_enroll.urls")),
+    path('', include("course_enroll.urls")),
     path('admin/', admin.site.urls),
 ]
