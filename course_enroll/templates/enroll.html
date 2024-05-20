@@ -4,6 +4,21 @@
         <title>Course Enroll</title>
     </head>
     <body>
-        
+        <h1>Courses</h1>
+        <ul>
+        {% for course in courses %}
+            <li>
+                <a href="{% url 'course_enroll:courses' course.id %}">{{ course.name }}</a>
+            </li>
+        {% endfor %}
+        </ul>
+        <div style="display: inline-block;">
+        {% if prev %}
+            <a href="{% url 'course_enroll:enroll_page' prev%}" >Previous</a>
+        {% endif %}
+        {% if next %}
+            <a href="{% url 'course_enroll:enroll_page' next%}">Next</a>
+        {% endif %}
+        </div>
     </body>
 </html>
