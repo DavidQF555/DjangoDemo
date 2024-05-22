@@ -2,14 +2,8 @@
 <html>
     <head>
         <title>Register</title>
-        <style>
-            .error {
-                color: red;
-            }
-            .success {
-                color: green
-            }
-        </style>
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'style.css' %}"/>
     </head>
     <body>
         <a href="{% url 'course_enroll:enroll' %}">Home</a>
