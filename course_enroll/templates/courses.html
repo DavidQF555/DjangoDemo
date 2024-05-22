@@ -2,6 +2,14 @@
 <html>
     <head>
         <title>{{ course.name }}</title>
+        <style>
+            .error {
+                color: red;
+            }
+            .success {
+                color: green
+            }
+        </style>
     </head>
     <body>
         <a href="{% url 'course_enroll:enroll' %}">Home</a>
@@ -12,8 +20,22 @@
         {% endif %}
         
         <h1>{{ course.name }}</h1>
+        {% if messages %}
+            <ul>
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
         <p>{{ course.description }}</p>
         <br />
         <p>{{ count }}/{{ course.capacity }}</p>
+
+        {% if auth %}
+        <form method="post" action="{% url 'course_enroll:courses' course.id %}">
+            {% csrf_token %}
+            <input type="submit" value="Enroll">
+        </form>
+        {% endif %}
     </body>
 </html>

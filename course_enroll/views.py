@@ -31,6 +31,26 @@ def courses(request, id):
     except Course.DoesNotExist:
         raise Http404("Course does not exist")
     count = Student.objects.filter(courses__in=[id]).count()
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            try:
+                student = Student.objects.get(user_id=request.user.id)
+            except Student.DoesNotExist:
+                messages.add_message(request, messages.ERROR, "Not a student.")
+                return HttpResponseRedirect(reverse('course_enroll:courses', args=(id,)))
+            if student.courses.filter(id=id).exists():
+                messages.add_message(request, messages.ERROR, "Already enrolled.")
+                return HttpResponseRedirect(reverse('course_enroll:courses', args=(id,)))
+            if count >= course.capacity:
+                messages.add_message(request, messages.ERROR, "Course full.")
+                return HttpResponseRedirect(reverse('course_enroll:courses', args=(id,)))
+            student.courses.add(course)
+            student.save()
+            messages.add_message(request, messages.SUCCESS, "Successfully enrolled.")
+            return HttpResponseRedirect(reverse('course_enroll:courses', args=(id,)))
+        else:
+            messages.add_message(request, messages.ERROR, "Must be logged in.")
+            return HttpResponseRedirect(reverse('course_enroll:courses', args=(id,)))
     return render(request, "courses.html", { "course": course, "count": count, 'auth': request.user.is_authenticated })
 
 def register(request, id):
@@ -66,6 +86,8 @@ def account_register(request):
             return HttpResponseRedirect(reverse("course_enroll:register"))
         user = User.objects.create_user(username=username, password=password)
         user.save()
+        student = Student.objects.create(user=user)
+        student.save()
         messages.add_message(request, messages.SUCCESS, "Successfully registered. Please login.")
         return HttpResponseRedirect(reverse("course_enroll:register"))
     if request.user.is_authenticated:
