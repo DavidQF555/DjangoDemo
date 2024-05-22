@@ -2,9 +2,32 @@
 <html>
     <head>
         <title>Course Enroll</title>
+        <style>
+            .error {
+                color: red;
+            }
+            .success {
+                color: green
+            }
+        </style>
     </head>
     <body>
+        {% if auth %}
+            <a href="{% url 'course_enroll:logout' %}">Logout</a>    
+        {% else %}
+            <a href="{% url 'course_enroll:login' %}">Login</a>
+        {% endif %}
+
+        {% if messages %}
+            <ul>
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+
         <h1>Courses</h1>
+        
         <ul>
         {% for course in courses %}
             <li>

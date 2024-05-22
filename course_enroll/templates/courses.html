@@ -4,8 +4,16 @@
         <title>{{ course.name }}</title>
     </head>
     <body>
-        <a href="{% url 'course_enroll:enroll' %}">Back</a>
+        <a href="{% url 'course_enroll:enroll' %}">Home</a>
+        {% if auth %}
+            <a href="{% url 'course_enroll:logout' %}">Logout</a>    
+        {% else %}
+            <a href="{% url 'course_enroll:login' %}">Login</a>
+        {% endif %}
+        
         <h1>{{ course.name }}</h1>
         <p>{{ course.description }}</p>
+        <br />
+        <p>{{ count }}/{{ course.capacity }}</p>
     </body>
 </html>
