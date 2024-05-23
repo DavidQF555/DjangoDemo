@@ -53,6 +53,17 @@ def courses(request, id):
             return HttpResponseRedirect(reverse('course_enroll:courses', args=(id,)))
     return render(request, "courses.html", { "course": course, "count": count, 'auth': request.user.is_authenticated })
 
+def enrolled(request):
+    if not request.user.is_authenticated:
+        messages.add_message(request, messages.ERROR, "Must be logged in.")
+        return HttpResponseRedirect(reverse('course_enroll:courses'))
+    try:
+        student = Student.objects.get(user=request.user)
+    except Student.DoesNotExist:
+        messages.add_message(request, messages.ERROR, "Not a student.")
+        return HttpResponseRedirect(reverse('course_enroll:courses'))
+    return render(request, "enrolled.html", { 'courses': student.courses.all() })
+
 def register(request, id):
     pass
 

@@ -7,7 +7,8 @@
     </head>
     <body>
         {% if auth %}
-            <a href="{% url 'course_enroll:logout' %}">Logout</a>    
+        <a href="{% url 'course_enroll:logout' %}">Logout</a>
+        <a href="{% url 'course_enroll:enrolled' %}">Enrolled</a>    
         {% else %}
             <a href="{% url 'course_enroll:login' %}">Login</a>
         {% endif %}
