@@ -26,10 +26,17 @@
         <p>{{ count }}/{{ course.capacity }}</p>
 
         {% if auth %}
-        <form method="post" action="{% url 'course_enroll:courses' course.id %}">
-            {% csrf_token %}
-            <input type="submit" value="Enroll">
-        </form>
+            {% if in_course %}
+            <form method="post" action="{% url 'course_enroll:leave_course' course.id %}">
+                {% csrf_token %}
+                <input type="submit" value="Leave">
+            </form>
+            {% else %}
+            <form method="post" action="{% url 'course_enroll:register_course' course.id %}">
+                {% csrf_token %}
+                <input type="submit" value="Enroll">
+            </form>    
+            {% endif %}
         {% endif %}
     </body>
 </html>

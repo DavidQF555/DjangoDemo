@@ -31,6 +31,20 @@ def courses(request, id):
     except Course.DoesNotExist:
         raise Http404("Course does not exist")
     count = Student.objects.filter(courses__in=[id]).count()
+    params = { "course": course, "count": count, 'auth': request.user.is_authenticated, "in_course": False }
+    if request.user.is_authenticated:
+        try:
+            student = Student.objects.get(user=request.user)
+            params["in_course"] = student.courses.filter(id=id).exists()
+        except Student.DoesNotExist:
+            pass
+    return render(request, "courses.html", params)
+
+def register_course(request, id):
+    try:
+        course = Course.objects.get(pk=id)
+    except Course.DoesNotExist:
+        raise Http404("Course does not exist")
     if request.method == 'POST':
         if request.user.is_authenticated:
             try:
@@ -41,17 +55,38 @@ def courses(request, id):
             if student.courses.filter(id=id).exists():
                 messages.add_message(request, messages.ERROR, "Already enrolled.")
                 return HttpResponseRedirect(reverse('course_enroll:courses', args=(id,)))
+            count = Student.objects.filter(courses__in=[id]).count()
             if count >= course.capacity:
                 messages.add_message(request, messages.ERROR, "Course full.")
                 return HttpResponseRedirect(reverse('course_enroll:courses', args=(id,)))
             student.courses.add(course)
             student.save()
             messages.add_message(request, messages.SUCCESS, "Successfully enrolled.")
-            return HttpResponseRedirect(reverse('course_enroll:courses', args=(id,)))
         else:
             messages.add_message(request, messages.ERROR, "Must be logged in.")
-            return HttpResponseRedirect(reverse('course_enroll:courses', args=(id,)))
-    return render(request, "courses.html", { "course": course, "count": count, 'auth': request.user.is_authenticated })
+    return HttpResponseRedirect(reverse('course_enroll:courses', args=(id,)))
+
+def leave_course(request, id):
+    try:
+        course = Course.objects.get(pk=id)
+    except Course.DoesNotExist:
+        raise Http404("Course does not exist")
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            try:
+                student = Student.objects.get(user_id=request.user.id)
+            except Student.DoesNotExist:
+                messages.add_message(request, messages.ERROR, "Not a student.")
+                return HttpResponseRedirect(reverse('course_enroll:courses', args=(id,)))
+            if not student.courses.filter(id=id).exists():
+                messages.add_message(request, messages.ERROR, "Not enrolled.")
+                return HttpResponseRedirect(reverse('course_enroll:courses', args=(id,)))
+            student.courses.remove(course)
+            student.save()
+            messages.add_message(request, messages.SUCCESS, "Successfully left.")
+        else:
+            messages.add_message(request, messages.ERROR, "Must be logged in.")
+    return HttpResponseRedirect(reverse('course_enroll:courses', args=(id,)))
 
 def enrolled(request):
     if not request.user.is_authenticated:
@@ -63,9 +98,6 @@ def enrolled(request):
         messages.add_message(request, messages.ERROR, "Not a student.")
         return HttpResponseRedirect(reverse('course_enroll:courses'))
     return render(request, "enrolled.html", { 'courses': student.courses.all() })
-
-def register(request, id):
-    pass
 
 def account_login(request):
     if request.method == 'POST':
